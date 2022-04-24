@@ -2,7 +2,6 @@
 from sklearn.datasets import make_blobs
 from sklearn.preprocessing import StandardScaler
 
-
 def get():
     centers = [[1, 1], [-1, -1], [1, -1]]
     X, labels_true = make_blobs(
