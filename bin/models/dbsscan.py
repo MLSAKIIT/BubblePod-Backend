@@ -16,6 +16,8 @@ labels = dbscan.labels_
 n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
 n_noise_ = list(labels).count(-1)
 
+
+#log 
 print("Estimated number of clusters: %d" % n_clusters_)
 print("Estimated number of noise points: %d" % n_noise_)
 print("Homogeneity: %0.3f" % metrics.homogeneity_score(labels_true, labels))
