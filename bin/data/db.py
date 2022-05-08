@@ -126,9 +126,3 @@ class bubbledb:
     def table_to_dataframe(self, table):
         dataframe = pd.read_sql(table, self.engine)
         return dataframe
-
-
-
-#Unit Testing
-bubbledb = bubbledb()
-print(bubbledb.table_to_dataframe("accounts").head())
