@@ -15,7 +15,7 @@ class bubbledb:
 
     def initialize(self) -> Dict[str, str]:
         parser = ConfigParser()
-        config = "app.ini"
+        config = "../../app.ini"
         parser.read(config)
         conn_info = {param[0]: param[1] for param in parser.items("accounts")}
         return conn_info

@@ -2,12 +2,12 @@
 Backend for BubblePod on Flask
 
 # Usable Functionalities
-/bin/data/db.py can create required database successfully
-/bin/models/dbsscan.py can run DBSCAN on the test.py succesfully
+DBMS fully functional
+Clustering fully functional
+API functional
 
 # Need to be Done
-API, Implement Python Package system for each view (page).
-WSGI
+API sugar, WSGI
 
 # Setup
 Install Postgres 14

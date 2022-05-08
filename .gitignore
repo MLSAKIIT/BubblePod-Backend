@@ -1,4 +1,3 @@
 *.log
 env/
 *.pyc
-weights.bin.gz

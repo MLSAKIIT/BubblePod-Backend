@@ -54,6 +54,7 @@ class Cluster:
             print(output_frame.head())
         return output_frame
 
+
     def plot():
         #Needs to be implemented
         pass

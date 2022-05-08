@@ -22,7 +22,7 @@ def retrieve_data(content):
     cluster.clusters()
     result = cluster.find_similar(username)
     output = result.head()
-    return output.to_json()
+    return output.to_json(orient='records')
 
 
 def dummyvalues(n=4500):
