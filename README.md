@@ -7,7 +7,6 @@ Backend for BubblePod on Flask
 
 # Need to be Done
 API, Implement Python Package system for each view (page).
-Databse I/O from API
 WSGI
 
 # Setup
