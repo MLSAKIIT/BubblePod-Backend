@@ -3,7 +3,7 @@ from sklearn.cluster import DBSCAN
 from sklearn.preprocessing import StandardScaler
 from gensim.models import Word2Vec
 
-# sample function
+
 class VecModel:  
     def __init__(self):
         self.weights = 'weights.embedding'
@@ -36,11 +36,7 @@ class VecModel:
 
     def infer(self, interest):
         model = Word2Vec.load(self.weights)
-        vector = []
-        try:
-            vector = model.wv.get_mean_vector(interest, weights=[1.4, 1.0, 0.6], pre_normalize=True, post_normalize=True, ignore_missing=True)
-        except:
-            pass
+        vector = model.wv.get_mean_vector(interest, weights=[1.4, 1.0, 0.6], pre_normalize=True, post_normalize=True, ignore_missing=True)
         return vector
 
 

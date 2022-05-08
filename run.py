@@ -6,7 +6,7 @@ def store_data(content):
     for key in content:
         data.append(content[key])
     bubbledb = db.bubbledb()
-    bubbledb.insert(data)
+    bubbledb.insert("accounts", data)
 
 def dummyvalues():
     bubbledb = db.bubbledb()
@@ -20,10 +20,13 @@ def dummyvalues():
         bubbledb.insert("accounts", data)
 
 # def retrieve_data(content):
+    # from bin.cluster.infer import Cluster
 #     data = content['username']
 #     cluster = Cluster()
 #     result = cluster.find_similar(data)
 #     print(result[:10])
 
 # dummyvalues()
-from bin.cluster.infer import Cluster
+bubbledb = db.bubbledb()
+bubbledb.create_main_table()
+store_data({ "username":"jokhn90", "email": "34330@kiit.ac.in", "interest1":"App_Development", "interest2":"Blockchain", "interest3":"Cryptography" })

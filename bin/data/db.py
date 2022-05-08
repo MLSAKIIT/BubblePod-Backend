@@ -11,10 +11,6 @@ class bubbledb:
         self.conn = psycopg2.connect(**conn_info)
         self.cur = self.conn.cursor()
         self.engine = sqlalchemy.create_engine('postgresql://postgres:password@localhost:5432/bubblepod')
-        try:
-            self.create_table()
-        except:
-            pass
 
 
     def initialize(self) -> Dict[str, str]:
@@ -120,8 +116,10 @@ class bubbledb:
         self.execute_sql(query)
         return self.cur.fetchall()
 
+
     def dataframe_to_table(self, dataframe):
         dataframe.to_sql('accounts', self.engine, if_exists="replace", index=False)
+        
 
     def table_to_dataframe(self, table):
         dataframe = pd.read_sql(table, self.engine)

@@ -5,14 +5,22 @@ import bin.cluster.models as models
 
 
 class Cluster:
-    def __init__(self, bubbledb, debug=False):
-        self.bubbledb = bubbledb
+    def __init__(self, debug=False):
+        self.bubbledb = db.bubbledb()
         self.dataframe = self.bubbledb.table_to_dataframe("accounts")
-        self.dataset = self.dataframe.drop(["index", "username", "email", "clutser"], inplace=True)
+        self.preprocess()
         self.model = models.VecModel()
         self.debug = debug
 
 
+    def preprocess(self):
+        self.dataframe.drop(["index", "username", "email"], axis=1, inplace=True)
+        try:
+            self.dataframe.drop(["cluster"], axis=1, inplace=True)
+        except:
+            pass
+
+    
     def dummyvalues(self):
         import random
         data = []
@@ -25,29 +33,34 @@ class Cluster:
 
     def vectorise(self):
         vectors = []
-        data = self.dataset.values.tolist()
-        print(data)
-        for interests in data:
-            for interest in interests:
-                print(interest)
-                vectors.append(self.model.infer(interest))
+        interests = self.dataframe.values.tolist()
+        if self.debug:
+            print(interests)
+        for interest in interests:
+            # print(interest)
+            vectors.append(self.model.infer(interest))
         return np.asarray(vectors)
+
+
+    def store_clusters(self, labels):
+        self.dataframe = self.bubbledb.table_to_dataframe("accounts")
+        self.dataframe['cluster'] = labels
+        self.bubbledb.dataframe_to_table(self.dataframe)
 
 
     def clusters(self):
         x = self.vectorise()
-        print(x)
         labels = self.model.dbscan(x, self.debug)
         if self.debug:
+            print(x)
             print(labels)
-        self.dataset['cluster'] = labels
-        print(self.dataset)
-        self.bubbledb.dataframe_to_table(self.dataset)
+            print(self.dataframe)
+        self.store_clusters(labels)
 
     
     def find_similar(self, label):
         # label = self.bubbledb.fetch(username)
-        output_frame = self.dataset.loc[self.dataset['cluster'] == label]
+        output_frame = self.dataframe.loc[self.dataframe['cluster'] == label]
         if self.debug:
             print(output_frame.head())
         return output_frame
@@ -57,32 +70,21 @@ class Cluster:
         pass
 
 
-# dummyvalues(bubbledb)
-# cluster = Cluster(debug=True)
-# cluster.clusters()
-# cluster.find_similar(2)
 
-# bubbledb = db.bubbledb()
-# def dummyvalues():
-#     bubbledb = db.bubbledb()
-#     bubbledb.create_main_table()
-#     import random
-#     data = []
-#     for i in range(4500):
-#         data1 = [f'dasykfhhh{i}89', f'2g828106{i}@gmail.com']
-#         data2 = ['Blockchain', 'App_Development', 'Cryptography']
-#         data = data1 + [random.choice(data2), random.choice(data2), random.choice(data2)]
-#         bubbledb.insert("accounts", data)
+def dummyvalues():
+    bubbledb = db.bubbledb()
+    bubbledb.create_main_table()
+    import random
+    data = []
+    for i in range(4500):
+        data1 = [f'dasykfhhh{i}89', f'2g828106{i}@gmail.com']
+        data2 = ['Blockchain', 'App_Development', 'Cryptography']
+        data = data1 + [random.choice(data2), random.choice(data2), random.choice(data2)]
+        bubbledb.insert("accounts", data)
+
+
+
 # dummyvalues()
-
-
-# print(dataset.head())
-# engine = sqlalchemy.create_engine('postgresql://postgres:password@localhost:5432/bubblepod')
-# dataset.to_sql('accounts', engine, if_exists="replace", index=False)
-# data = dataset.values.tolist()
-# for interest in data:
-#     print(interest)
-
-bubbledb = db.bubbledb()
-cluster = Cluster(bubbledb,debug=True)
-print(cluster.vectorise())
+cluster = Cluster()
+cluster.clusters()
+print(cluster.find_similar(2).head())
