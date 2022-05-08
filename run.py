@@ -35,7 +35,3 @@ def dummyvalues(n=4500):
         data2 = ['Blockchain', 'App_Development', 'Cryptography']
         data = data1 + [random.choice(data2), random.choice(data2), random.choice(data2)]
         bubbledb.insert("accounts", data)
-
-# dummyvalues()
-output = retrieve_data({ "username":"jokhn90", "email": "34330@kiit.ac.in", "interest1":"App_Development", "interest2":"Blockchain", "interest3":"Cryptography" })
-print(output)
