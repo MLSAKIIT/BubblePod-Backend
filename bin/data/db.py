@@ -1,19 +1,26 @@
 from configparser import ConfigParser
 import psycopg2
 from typing import Dict
+import sqlalchemy
+import pandas as pd
 
 
 class bubbledb:
     def __init__(self):
-        conn_info = self.initialize("db.ini")
+        conn_info = self.initialize()
         self.conn = psycopg2.connect(**conn_info)
         self.cur = self.conn.cursor()
+        self.engine = sqlalchemy.create_engine('postgresql://postgres:password@localhost:5432/bubblepod')
+        try:
+            self.create_table()
+        except:
+            pass
 
 
-    def initialize(ini_filename: str) -> Dict[str, str]:
+    def initialize(self) -> Dict[str, str]:
         parser = ConfigParser()
-        parser.read(ini_filename)
-        # Create a dictionary of the variables stored under the "accounts" section of the .ini
+        config = "app.ini"
+        parser.read(config)
         conn_info = {param[0]: param[1] for param in parser.items("accounts")}
         return conn_info
 
@@ -24,6 +31,7 @@ class bubbledb:
     
 
     def execute_sql(self, query: str) -> None:
+        self.cur = self.conn.cursor() #reinitialise incase cursor is closed. 
         try:
             self.cur.execute(query)
         except Exception as e:
@@ -35,41 +43,74 @@ class bubbledb:
             self.conn.commit()
 
             
-    def create_table(self) -> None:
+    def create_main_table(self) -> None:
         query = """
                     CREATE TABLE IF NOT EXISTS accounts (
-                    user_id serial PRIMARY KEY,
+                    index serial PRIMARY KEY,
                     username VARCHAR(20) UNIQUE NOT NULL,
-                    password VARCHAR(100) NOT NULL,
                     email VARCHAR(100) UNIQUE NOT NULL,
-                    created_on TIMESTAMP NOT NULL,
-                    last_login TIMESTAMP NOT NULL,
                     interest1 VARCHAR(50) NOT NULL,
                     interest2 VARCHAR(50) NOT NULL,
                     interest3 VARCHAR(50) NOT NULL,
-                    cluster INT UNIQUE NOT NULL);
-                """
-        self.execute_sql(query)
-    
-    
-    def insert(self, data) -> None:
-        query = f"""
-                    INSERT INTO accounts()
-                    VALUES ({data[1]},
-                            {data[2]},
-                            {data[3]},
-                            {data[4]},
-                            {data[5]},
-                            {data[6]},
-                            {data[7]},
-                            {data[8]};
+                    cluster INT);
                 """
         self.execute_sql(query)
 
     
-    def fetch(self):
-        #logic needs to be implemented depending on how frontend calls for displaying user profiles will be
-        pass
+    def create_db(self) -> None:
+        # Connect just to PostgreSQL with the user loaded from the .ini file
+        conn_info = self.initialize()
+        psql_connection_string = f"user={conn_info['user']} password={conn_info['password']}"
+        conn = psycopg2.connect(psql_connection_string)
+        cur = conn.cursor()
+
+        # "CREATE DATABASE" requires automatic commits
+        conn.autocommit = True
+        sql_query = f"CREATE DATABASE {conn_info['database']}"
+
+        try:
+            cur.execute(sql_query)
+        except Exception as e:
+            print(f"{type(e).__name__}: {e}")
+            print(f"Query: {cur.query}")
+            cur.close()
+        else:
+            # Revert autocommit settings
+            conn.autocommit = False
+
+    
+    def insert(self, table, data) -> None:
+        if table == "accounts":
+            query = f"""
+                        INSERT INTO accounts (
+                            username,
+                            email,
+                            interest1,
+                            interest2,
+                            interest3
+                        )
+                        VALUES ('{data[0]}',
+                                '{data[1]}',
+                                '{data[2]}',
+                                '{data[3]}',
+                                '{data[4]}');
+                    """
+        elif table == "clusters":
+            query = f"""
+                INSERT INTO clusters (cluster)
+                VALUES ({data});
+            """
+        self.execute_sql(query)
+
+    
+    def fetch(self, username):
+        query = f"""
+                    SELECT cluster
+                    FROM accounts
+                    WHERE username = '{username}';        
+                """
+        self.execute_sql(query)
+        return self.cur.fetchone()
 
 
     def fetch_interests(self):
@@ -79,27 +120,15 @@ class bubbledb:
         self.execute_sql(query)
         return self.cur.fetchall()
 
+    def dataframe_to_table(self, dataframe):
+        dataframe.to_sql('accounts', self.engine, if_exists="replace", index=False)
+
+    def table_to_dataframe(self, table):
+        dataframe = pd.read_sql(table, self.engine)
+        return dataframe
 
 
 
-#This is a special function due to the way psql works
-def create_db(conn_info = bubbledb.initialize()) -> None:
-    # Connect just to PostgreSQL with the user loaded from the .ini file
-    psql_connection_string = f"user={conn_info['user']} password={conn_info['password']}"
-    conn = psycopg2.connect(psql_connection_string)
-    cur = conn.cursor()
-
-    # "CREATE DATABASE" requires automatic commits
-    conn.autocommit = True
-    sql_query = f"CREATE DATABASE {conn_info['database']}"
-
-    try:
-        cur.execute(sql_query)
-    except Exception as e:
-        print(f"{type(e).__name__}: {e}")
-        print(f"Query: {cur.query}")
-        cur.close()
-    else:
-        # Revert autocommit settings
-        conn.autocommit = False
-
+#Unit Testing
+bubbledb = bubbledb()
+print(bubbledb.table_to_dataframe("accounts").head())
