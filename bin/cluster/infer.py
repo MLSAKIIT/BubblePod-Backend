@@ -20,16 +20,6 @@ class Cluster:
         except:
             pass
 
-    
-    def dummyvalues(self):
-        import random
-        data = []
-        for i in range(4500):
-            data1 = [f'dasykfhhh{i}89', f'2g828106{i}@gmail.com']
-            data2 = ['Blockchain', 'App_Development', 'Cryptography']
-            data = data1 + [random.choice(data2), random.choice(data2), random.choice(data2)]
-            self.bubbledb.insert(data)
-
 
     def vectorise(self):
         vectors = []
@@ -59,8 +49,7 @@ class Cluster:
 
     
     def find_similar(self, label):
-        # label = self.bubbledb.fetch(username)
-        output_frame = self.dataframe.loc[self.dataframe['cluster'] == label]
+        output_frame = self.dataframe.loc[self.dataframe['username'] == label]
         if self.debug:
             print(output_frame.head())
         return output_frame
@@ -81,10 +70,3 @@ def dummyvalues():
         data2 = ['Blockchain', 'App_Development', 'Cryptography']
         data = data1 + [random.choice(data2), random.choice(data2), random.choice(data2)]
         bubbledb.insert("accounts", data)
-
-
-
-# dummyvalues()
-cluster = Cluster()
-cluster.clusters()
-print(cluster.find_similar(2).head())
