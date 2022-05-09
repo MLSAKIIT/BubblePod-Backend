@@ -29,16 +29,7 @@ google = oauth.register(
 ################Routing Table################
 @app.route('/')
 def index():
-    # return redirect(os.environ.get('frontend'))
-    email = dict(session).get('profile', None)
-    return f"Welcome {email.get('family_name')}"
-
-
-@app.route('/')
-def create_profile():
-    # return redirect(os.environ.get('frontend'))
-    email = dict(session).get('profile', None)
-    return f"Welcome {email.get('family_name')}"
+    return redirect('/bubblepod') #frontend uri
 
 
 @app.route('/login')
