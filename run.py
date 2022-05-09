@@ -19,7 +19,13 @@ def retrieve_user(content):
     bubbledb = db.bubbledb()
     username = content.get("username")
     data = bubbledb.fetch(username)
-    return data[1:-1]
+    output = {}
+    keys = ['username', 'email']
+    i = 1
+    for key in keys:
+        output[key] = data[i]
+        i+=1
+    return output
 
 
 def retrieve_recoms(content):
