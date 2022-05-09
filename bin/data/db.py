@@ -10,7 +10,7 @@ class bubbledb:
         conn_info = self.initialize()
         self.conn = psycopg2.connect(**conn_info)
         self.cur = self.conn.cursor()
-        self.engine = sqlalchemy.create_engine('postgresql://postgres:password@localhost:5432/bubblepod')
+        self.engine = sqlalchemy.create_engine(f"postgresql://{conn_info['user']}:{conn_info['password']}@{conn_info['host']}:5432/{conn_info['database']}")
 
 
     def initialize(self) -> Dict[str, str]:
