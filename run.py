@@ -34,6 +34,7 @@ def retrieve_recoms(content):
     cluster = Cluster()
     cluster.clusters()
     result = cluster.find_similar(username)
+    result.drop(['index', 'cluster'], axis=1, inplace=True)
     output = result.head()
     return output.to_json(orient='records')
 
@@ -48,6 +49,3 @@ def dummyvalues(n=4500):
         data2 = ['Blockchain', 'App_Development', 'Cryptography']
         data = data1 + [random.choice(data2), random.choice(data2), random.choice(data2)]
         bubbledb.insert("accounts", data)
-
-
-# print(retrieve_user({'username': 'jokhn90'}))
