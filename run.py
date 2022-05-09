@@ -1,21 +1,28 @@
-import pandas as pd
 from bin.data import db
 
 
-def store_data(content):
+def store_user(content):
     bubbledb = db.bubbledb()
     try:
         bubbledb.create_main_table()
     except:
         pass
     data = []
-    for key in content:
+    #ensure correct arrangement of data
+    keys = ['username', 'name', 'email', 'interest1', 'interest2', 'interest3']
+    for key in keys:
         data.append(content[key])
-    bubbledb = db.bubbledb()
     bubbledb.insert("accounts", data)
 
 
-def retrieve_data(content):
+def retrieve_user(content):
+    bubbledb = db.bubbledb()
+    username = content.get("username")
+    data = bubbledb.fetch(username)
+    return data[1:-1]
+
+
+def retrieve_recoms(content):
     from bin.cluster.infer import Cluster
     username = content['username']
     cluster = Cluster()
@@ -35,3 +42,6 @@ def dummyvalues(n=4500):
         data2 = ['Blockchain', 'App_Development', 'Cryptography']
         data = data1 + [random.choice(data2), random.choice(data2), random.choice(data2)]
         bubbledb.insert("accounts", data)
+
+
+# print(retrieve_user({'username': 'jokhn90'}))
